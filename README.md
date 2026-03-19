@@ -1,231 +1,239 @@
-# MB.UZ-HACKTHON
+# Personal Finance Tracker Backend
 
-# Xarajatlarni Toifalash va Shaxsiy Moliyani Boshqarish Tizimi
+Shaxsiy moliyani boshqarish uchun yaratilgan backend API. Ushbu loyiha foydalanuvchiga accountlar, daromadlar, xarajatlar, transferlar, qarzlar, byudjet va analytics ma’lumotlarini boshqarish imkonini beradi.
 
-## 1. Kirish
+## Asosiy imkoniyatlar
 
-Zamonaviy fintech va smart banking ilovalarda foydalanuvchilarning nafaqat xarajatlarini, balki daromadlari, balanslari, qarz va haqdorliklarini ham kompleks tarzda boshqarish muhim hisoblanadi.  
+- JWT asosidagi autentifikatsiya
+- Ro‘yxatdan o‘tish va tizimga kirish
+- Account va kartalarni boshqarish
+- Income va expense transactionlar
+- Accountlar orasida transfer
+- Debt va receivable yozuvlari
+- Monthly budget va category limitlar
+- Dashboard analytics
+- Token refresh va auto auth flow
 
-Ushbu task foydalanuvchining **shaxsiy moliyasini to‘liq nazorat qilishga yo‘naltirilgan yengil, ammo funksional moliyaviy boshqaruv tizimini** yaratishni nazarda tutadi.
+## Tech Stack
 
----
+- Python
+- Django
+- Django REST Framework
+- PostgreSQL
+- Simple JWT
+- Django Filter
 
-# 2. Muammo Bayoni
+## Loyihaning modullari
 
-Ko‘pchilik foydalanuvchilar:
+- `users` — auth, register, me
+- `accounts` — account va kartalar
+- `categories` — income/expense kategoriyalar
+- `transactions` — daromad va xarajatlar
+- `transfers` — accountlar orasidagi o‘tkazmalar
+- `debts` — qarz va haqdorliklar
+- `budgets` — monthly budget va limitlar
+- `analytics_app` — dashboard statistikasi
 
-- xarajat va daromadlarni alohida tizimlarda yoki umuman qayd etmaydi;
-- qaysi karta yoki accountda qancha mablag‘ borligini real vaqtda bilmaydi;
-- qarzlari va boshqalardan olishi kerak bo‘lgan pullarni (haqdorlik) unutib qo‘yadi;
-- oylik byudjet va real sarf o‘rtasidagi farqni nazorat qila olmaydi.
+## O‘rnatish
 
-Natijada:
+### 1. Repository ni clone qilish
 
-- shaxsiy moliyaviy intizom pasayadi
-- noto‘g‘ri moliyaviy qarorlar qabul qilinadi.
+```bash
+git clone <BACKEND_REPOSITORY_URL>
+cd <BACKEND_PROJECT_FOLDER>
+```
 
----
+### 2. Virtual environment yaratish
 
-# 3. Vazifa Tavsifi
+```bash
+python -m venv venv
+```
 
-Ishtirokchilar **foydalanuvchi daromadlari (income), xarajatlari (expense), account va kartalari, balanslari, qarzlari va haqdorliklarini yagona tizimda boshqarish imkonini beruvchi fintech ilova** ishlab chiqishlari kerak.
+Windows:
 
-Ilova:
+```bash
+venv\Scripts\activate
+```
 
-- **Web** yoki **Mobile** bo‘lishi mumkin
-- **Hackathon doirasida MVP darajasida** ishlab chiqilishi kerak
+Linux / macOS:
 
-Qo‘shimcha imkoniyat:
+```bash
+source venv/bin/activate
+```
 
-- **Oila a’zolari bilan shared foydalanish**
-- xarajatlar va tushumlar umumiy hisoblanadi
+### 3. Paketlarni o‘rnatish
 
----
+```bash
+pip install -r requirements.txt
+```
 
-# 4. Asosiy Funksional Talablar
+### 4. `.env` fayl yaratish
 
-## Account va Kartalar
+Loyiha rootida `.env` oching:
 
-- account va bank kartalarini qo‘shish  
-  - nomi
-  - turi
-  - valyuta
-  - boshlang‘ich balans
+```env
+SECRET_KEY=your-secret-key
+DEBUG=True
 
-- har bir account/karta uchun **joriy balansni ko‘rish**
+DB_NAME=finance_db
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=localhost
+DB_PORT=5432
 
----
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/finance_db
 
-## Xarajatlar (Expenses)
+ALLOWED_HOSTS=127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
+CORS_ALLOWED_ORIGINS=http://localhost:5173
+```
 
-- xarajat qo‘shish
-  - summa
-  - sana
-  - tavsif
-  - kategoriya
+### 5. Migratsiyalarni ishga tushirish
 
-- xarajat qaysi account/karta yoki naqd puldan qilinganini tanlash
-- xarajat kiritilganda **balans avtomatik kamayishi**
-- xarajatlarni **tahrirlash**
-- xarajatlarni **o‘chirish**
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
 
----
+### 6. Superuser yaratish
 
-## Daromadlar (Income)
+```bash
+python manage.py createsuperuser
+```
 
-- daromad qo‘shish
-  - summa
-  - sana
-  - manba
-  - category
+### 7. Serverni ishga tushirish
 
-- daromad qaysi account yoki kartaga tushganini belgilash
-- naqd pul varianti ham bo‘lishi mumkin
-- daromad qo‘shilganda **balans avtomatik oshishi**
+```bash
+python manage.py runserver
+```
 
----
+Backend odatda quyidagi manzilda ishlaydi:
 
-## Transferlar
+```text
+http://127.0.0.1:8000/
+```
 
-- bir account/kartadan boshqasiga pul o‘tkazish
-- transfer vaqtida:
-  - bir balans kamayadi
-  - boshqasi oshadi
+## API Endpointlar
 
-- agar **ikki xil valyuta** bo‘lsa
-  - **valyuta kursi orqali konvertatsiya qilish**
+### Auth
 
----
+- `POST /api/auth/register/`
+- `POST /api/auth/login/`
+- `POST /api/auth/refresh/`
+- `GET /api/auth/me/`
 
-## Qarzlar va Haqdorliklar
+### Accounts
 
-- berilgan qarzlarni qayd etish
-  - kimga
-  - qancha
+- `GET /api/accounts/`
+- `POST /api/accounts/`
+- `GET /api/accounts/{id}/`
+- `PUT /api/accounts/{id}/`
+- `DELETE /api/accounts/{id}/`
 
-- olinishi kerak bo‘lgan mablag‘larni (haqdorlik) yuritish
+### Categories
 
-- qarz holati:
-  - `OPEN`
-  - `CLOSED`
+- `GET /api/categories/`
+- `POST /api/categories/`
+- `GET /api/categories/{id}/`
+- `PUT /api/categories/{id}/`
+- `DELETE /api/categories/{id}/`
 
----
+### Transactions
 
-## Byudjet va Rejalashtirish
+- `GET /api/transactions/`
+- `POST /api/transactions/`
+- `GET /api/transactions/{id}/`
+- `PUT /api/transactions/{id}/`
+- `DELETE /api/transactions/{id}/`
 
-- oylik **daromad (income) byudjeti**
-- kategoriya bo‘yicha **xarajat limitlari**
+### Transfers
 
-Tizim quyidagilarni solishtiradi:
+- `GET /api/transfers/`
+- `POST /api/transfers/`
+- `GET /api/transfers/{id}/`
+- `DELETE /api/transfers/{id}/`
 
-- rejalashtirilgan byudjet
-- real xarajatlar
+### Debts
 
----
+- `GET /api/debts/`
+- `POST /api/debts/`
+- `GET /api/debts/{id}/`
+- `PUT /api/debts/{id}/`
+- `DELETE /api/debts/{id}/`
+- `PATCH /api/debts/{id}/close/`
+- `PATCH /api/debts/{id}/reopen/`
 
-# 5. Ko‘rish va Tahlil
+### Budgets
 
-Statistik tahlillar:
+- `GET /api/budgets/`
+- `POST /api/budgets/`
+- `GET /api/budgets/current/`
+- `GET /api/budgets/{id}/`
+- `DELETE /api/budgets/{id}/`
+- `GET /api/budgets/{budget_id}/limits/`
+- `POST /api/budgets/{budget_id}/limits/`
+- `DELETE /api/budgets/{budget_id}/limits/{id}/`
 
-### Umumiy statistika
+### Analytics
+
+- `GET /api/analytics/summary/`
+- `GET /api/analytics/category-breakdown/`
+- `GET /api/analytics/income-vs-expense/`
+- `GET /api/analytics/calendar/`
+- `GET /api/analytics/budget-vs-actual/`
+
+## Authentication
+
+Loyiha JWT token asosida ishlaydi.
+
+Login response:
+
+```json
+{
+  "access": "your-access-token",
+  "refresh": "your-refresh-token"
+}
+```
+
+Protected endpointlarga so‘rov yuborishda headerga token qo‘shiladi:
+
+```http
+Authorization: Bearer your-access-token
+```
+
+## Loyihaning maqsadi
+
+Bu loyiha hackathon doirasida yaratilgan bo‘lib, foydalanuvchining shaxsiy moliyasini bitta platformada boshqarish imkonini beradi:
+
+- account balansi
 - daromadlar
 - xarajatlar
+- qarzlar
+- byudjet
+- statistika
 
-### Kategoriya bo‘yicha statistika
+## Deployment
 
-### Vaqt bo‘yicha statistika
+Backend deploy uchun tavsiya etiladi:
 
-- yillik
-- oylik
-- haftalik
-- kunlik
+- Render
+- Railway
+- VPS
 
-### Qo‘shimcha tahlillar
+Production uchun kerakli narsalar:
 
-- kategoriya bo‘yicha **xarajatlar vs tushumlar**
-- **calendar view** orqali kunlik operatsiyalarni ko‘rish
+- `DEBUG=False`
+- `ALLOWED_HOSTS`
+- `CSRF_TRUSTED_ORIGINS`
+- `CORS_ALLOWED_ORIGINS`
+- `DATABASE_URL`
+- `collectstatic`
+- `migrate`
 
----
+## Author
 
-# 6. Oila A’zolari Bilan Ulashish (Ixtiyoriy)
+Created for hackathon MVP by **[YOUR_NAME]**
 
-- oila a’zolarini taklif qilish
-- umumiy byudjet
-- umumiy xarajatlar
-- umumiy daromadlar
+## License
 
----
-
-# 7. AI va Avtomatlashtirish (Bonus)
-
-AI yoki rule-based tizim yordamida:
-
-### Avtomatik kategoriya aniqlash
-
-xarajat tavsifi asosida kategoriya aniqlash.
-
-### Xarajat tahlili
-
-foydalanuvchi odatlariga qarab:
-
-- moliyaviy tahlil
-- sarf odatlari
-
-### Ogohlantirishlar (Notifications)
-
-Misollar:
-
-- bu oy ma’lum kategoriya bo‘yicha odatdagidan ko‘p sarfladingiz
-- kommunal to‘lov qilish vaqti keldi
-- telefon to‘lovini qilish kerak
-
-AI/ML yoki oddiy **rule-based** yondashuvdan foydalanish mumkin.
-
----
-
-# 8. Asosiy Use Case Holatlari
-
-1. Foydalanuvchi yangi karta qo‘shadi va boshlang‘ich balans kiritadi.
-2. Foydalanuvchi xarajat kiritadi va balans avtomatik kamayadi.
-3. Foydalanuvchi daromad kiritadi va balans oshadi.
-4. Foydalanuvchi bir kartadan boshqasiga transfer qiladi.
-5. Foydalanuvchi qarz yoki haqdorlikni qayd etadi.
-6. Tizim oylik byudjet va real xarajatlarni solishtiradi.
-7. (Bonus) AI foydalanuvchiga moliyaviy tavsiyalar beradi.
-
----
-
-# 9. Texnik Talablar
-
-### Backend
-- REST API
-- **Java (tavsiya etiladi)**
-
-### Frontend
-- Web yoki Mobile
-- React
-- Flutter
-- Vue
-
-### Ma’lumotlar Bazasi
-
-- **PostgreSQL tavsiya etiladi**
-
-### AI Integratsiya
-
-- majburiy emas
-- ammo qo‘llab-quvvatlanadi
-
----
-
-# 10. Kutilayotgan Natija
-
-Hackathon yakunida ishtirokchilar:
-
-- ishlaydigan **web yoki mobile fintech ilova**
-- foydalanuvchining **shaxsiy moliyasini to‘liq boshqarish imkoniyati**
-- daromad, xarajat, balans, qarzlarni boshqarish tizimi
-- statistik tahlillar
-- (ixtiyoriy) **AI asosidagi avtomatlashtirish va ogohlantirishlar**
-
-namoyish qilib berishlari kerak.
+This project is created for educational and hackathon purposes.
